@@ -16,12 +16,27 @@ async def json_worker(path, queue, user_data):
             except FileNotFoundError:
                 data = {} # Set to empty if no file found
 
-            # -- Add the new data to the dict
-            if update["user_did"] not in data:
-                data[update["user_did"]] = {} # Set to empty dict if user was not in the file
-            data[update["user_did"]]["nickname"] = update["nickname"]
-            user_data.clear()
-            user_data.update(data)
+            # -- Get the update data
+            if update.get("type") == "update":
+                user_did = update["user_did"]
+                update_data = {}
+                for key, value in update.items():
+                    if key not in ["type", "user_did"]:
+                        update_data[key] = value
+                        
+                if user_did not in data:
+                    data[user_did] = {} # Set to empty dict if user was not in the file
+                data[user_did].update(update_data)
+                user_data.clear()
+                user_data.update(data)
+            
+            # -- Delete a user's data
+            elif update.get("type") == "delete":
+                user_did = update["user_did"]
+                if user_did in data:
+                    del data[user_did]
+                    user_data.clear()
+                    user_data.update(data)
 
             # -- Update the file
             with open(path, "w", encoding="utf-8") as f:
