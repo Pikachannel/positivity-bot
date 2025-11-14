@@ -37,7 +37,7 @@ async def main():
     # -- Setup client connection
     client, profile = await login(HANDLE, PASSWORD)
     if not client:
-        input("[Run] Press enter to exit...")
+        input("[Run Positive] Press enter to exit...")
         return
 
     # -- Create queues
