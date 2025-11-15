@@ -10,12 +10,12 @@ class Websocket():
     def __init__(self, endpoint: str = None):
         self.endpoint = "wss://jetstream1.us-east.bsky.network/subscribe"
         self.reconnect = 1
-        self.connect = False
+        self.connected = False
 
     # -- Connect function
     async def connect(self, queue):
         # Try to connect infinitely 
-        self.connect = True
+        self.connected = True
         while self.connected:
             try:
                 # Connect to the bsky jetstream
