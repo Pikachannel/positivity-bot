@@ -29,7 +29,7 @@ This bot responds to users' posts with positive messages!
 
 #### Custom nickname
 1. Send a direct message to the bot in the format:  
-   - **Setting Nickname:** `!nickname 'insert_nickname_here'`
+   - **Setting Nickname:** `!nickname insert_nickname_here`
    - **Resetting Nickname:** `!nickname`
 3. Wait for the bot to respond **before** sending a new message.
    - Responses may take up to 5 minutes.
