@@ -41,7 +41,7 @@ async def check_dms(client, json_queue, account_did):
                         user_data = {
                             "type": "update",
                             "user_did": user_did,
-                            "nickname": nickname.strip()
+                            "nickname": nickname.strip()[:20]
                         }
                         
                         await json_queue.put(user_data)
