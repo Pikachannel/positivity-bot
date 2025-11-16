@@ -3,7 +3,7 @@ import random
 from atproto import Client, client_utils
 
 # -------- Make Post Function --------
-async def make_post(client, post_cid, post_uri, user_did, messages, user_data):
+async def make_post(client, post_cid, post_uri, user_did, messages, user_data, lang="en"):
     # -- Check if the user has a nickname set
     display_name = user_data.get(user_did, {}).get("nickname", None)
 
@@ -15,7 +15,7 @@ async def make_post(client, post_cid, post_uri, user_did, messages, user_data):
             display_name = users_profile.handle.split(".")[0] # Set to users handle if no display name is found
 
     # -- Format the random message with display name
-    random_message = random.choice(messages)
+    random_message = random.choice(messages[lang])
     formatted_message = random_message.format(display_name=display_name)
 
     reply_builder = client_utils.TextBuilder()
