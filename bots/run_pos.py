@@ -27,7 +27,7 @@ followers_set = set()
 
 # -------- Load json files --------
 with open(MESSAGES_JSON_PATH, "r", encoding="utf-8") as f:
-    messages = json.load(f)["messages"]["en"]
+    messages = json.load(f)["messages"]
 
 with open(USER_DATA_PATH, "r", encoding="utf-8") as f:
     user_data = json.load(f)
