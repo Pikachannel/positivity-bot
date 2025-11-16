@@ -71,5 +71,5 @@ If you would like your data deleted from the bot, there are two options:
   2. Await confirmation that your data has been deleted from the bot's storage.
 
 ## License
-This repository is currently private. All ownership remains with Pikachannel (Ashley)
-
+This repository is open source and released using the MIT License.
+See [LICENSE](https://github.com/Pikachannel/bluesky-bots/blob/main/LICENSE) for further details.
