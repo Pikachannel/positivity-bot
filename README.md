@@ -18,7 +18,7 @@ This bot responds to users' posts with positive messages!
 2. **Deleting replies**: Users can delete a reply sent by the bot by replying with "delete".
 3. **Custom nicknames**: Users can set a custom nickname instead of using their Bluesky display name.
 4. **Post chance**: Users can change the chance of a reply being made under their post.
-5. ""Post interval**: Users can change the amount of time in between replies being able to be made under their posts.
+5. **Post interval**: Users can change the amount of time in between replies being able to be made under their posts.
 
 ### How to use
 1. Follow the bot on Bluesky.
