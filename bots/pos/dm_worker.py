@@ -23,7 +23,6 @@ async def check_dms(client, json_queue, account_did):
                 sent_at = convo.last_message.sent_at
                 sent_at = datetime.fromisoformat(sent_at.replace("Z", "+00:00"))
 
-
                 # -- Check if the message was sent in the last 5 minutes
                 now = datetime.now(timezone.utc)
                 if now - sent_at >= timedelta(minutes=5):
@@ -60,16 +59,56 @@ async def check_dms(client, json_queue, account_did):
                                 ),
                             )
                         )
+                
+                    
+                # -- Add the chance value to the json queue
+                elif parts[0] == "!chance":
+                    # -- Check if the user is resetting or has provided a number
+                    chance_value = parts[1] if len(parts) > 1 else "!pop_entry"
+                    if not chance_value.isdigit() and chance_value != "!pop_entry":
+                        error_message(dm, convo)
+                        continue
+                    if chance_value != "!pop_entry":
+                        chance_value = float(chance_value)
+                        if chance_value < 0 or chance_value > 100: # Make sure the number provided is with the valid range
+                            error_message(dm, convo)
+                            continue
 
+                    # -- Add the chance value to the json queue
+                    chance_data = {
+                        "type": "update",
+                        "user_did": user_did,
+                        "chance": float(str(chance_value)[:5]) if chance_value != "!pop_entry" else "!pop_entry" # Truncate the value to 2 decimal places
+                    }
+                    
+                    await json_queue.put(chance_data)
+
+                    if chance_value != "!pop_entry":
+                        dm_text = f"The chance of a reply under your posts is now'{chance_value}%'!\nYou can change this at anytime by sending the same command."
+                    else:
+                        dm_text = "The chance of a reply under your posts has been reset to 100%."
+
+                    # -- Send a confirmation message
+                    dm.send_message(
+                        models.ChatBskyConvoSendMessage.Data(
+                            convo_id=convo.id,
+                            message=models.ChatBskyConvoDefs.MessageInput(
+                                text=dm_text
+                            ),
+                        )
+                    )
+                
                 # -- Add the interval value to the json queue
                 elif parts[0] == "!interval":
                     # -- Check if the user is resetting or has provided a number
                     interval_value = parts[1] if len(parts) > 1 else "!pop_entry"
                     if not interval_value.isdigit() and interval_value != "!pop_entry":
+                        error_message(dm, convo)
                         continue
                     if interval_value != "!pop_entry":
                         interval_value = int(interval_value)
                         if interval_value < 0 or interval_value > 3600:
+                            error_message(dm, convo)
                             continue
                     
                     # -- Add the interval value to the json queue
@@ -96,41 +135,7 @@ async def check_dms(client, json_queue, account_did):
                         )
                     )
 
-                # -- Add the chance value to the json queue
-                elif parts[0] == "!chance":
-                    # -- Check if the user is resetting or has provided a number
-                    chance_value = parts[1] if len(parts) > 1 else "!pop_entry"
-                    if not chance_value.isdigit() and chance_value != "!pop_entry":
-                        continue
-                    if chance_value != "!pop_entry":
-                        chance_value = float(chance_value)
-                        if chance_value < 0 or chance_value > 100: # Make sure the number provided is with the valid range
-                            continue
-
-                    # -- Add the chance value to the json queue
-                    chance_data = {
-                        "type": "update",
-                        "user_did": user_did,
-                        "chance": float(str(chance_value)[:5]) if chance_value != "!pop_entry" else "!pop_entry" # Truncate the value to 2 decimal places
-                    }
-                    
-                    await json_queue.put(chance_data)
-
-                    if chance_value != "!pop_entry":
-                        dm_text = f"The chance of a reply under your posts is now'{chance_value}%'!\nYou can change this at anytime by sending the same command."
-                    else:
-                        dm_text = "The chance of a reply under your posts has been reset to 100%."
-
-                    # -- Send a confirmation message
-                    dm.send_message(
-                        models.ChatBskyConvoSendMessage.Data(
-                            convo_id=convo.id,
-                            message=models.ChatBskyConvoDefs.MessageInput(
-                                text=dm_text
-                            ),
-                        )
-                    )
-
+                            
                 # -- Handle deleting a user's data
                 elif parts[0] == "!delete":
                     delete_data = {
@@ -150,10 +155,18 @@ async def check_dms(client, json_queue, account_did):
                         )
                     )
 
-
         except Exception as e:
             print(f"[DM Worker] Error: {e}")
             continue
         finally:
             await asyncio.sleep(300) # -- Check dms every 5 minutes
                 
+def error_message(dm, convo):
+    dm.send_message(
+    models.ChatBskyConvoSendMessage.Data(
+        convo_id=convo.id,
+        message=models.ChatBskyConvoDefs.MessageInput(
+            text=f"An error occurred while processing your request.\nPlease make sure you format the command correctly and try again."
+        ),
+    )
+)
