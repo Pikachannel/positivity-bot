@@ -65,7 +65,14 @@ async def check_dms(client, json_queue, account_did):
                 elif parts[0] == "!chance":
                     # -- Check if the user is resetting or has provided a number
                     chance_value = parts[1] if len(parts) > 1 else "!pop_entry"
-                    if not chance_value.isdigit() and chance_value != "!pop_entry":
+                    if chance_value != "pop_entry":
+                        try:
+                            chance_value = float(chance_value)
+                            is_digit = True
+                        except:
+                            is_digit = False
+
+                    if not is_digit and chance_value != "!pop_entry":
                         error_message(dm, convo)
                         continue
                     if chance_value != "!pop_entry":
@@ -102,7 +109,14 @@ async def check_dms(client, json_queue, account_did):
                 elif parts[0] == "!interval":
                     # -- Check if the user is resetting or has provided a number
                     interval_value = parts[1] if len(parts) > 1 else "!pop_entry"
-                    if not interval_value.isdigit() and interval_value != "!pop_entry":
+                    if interval_value != "pop_entry":
+                        try:
+                            interval_value = float(interval_value)
+                            is_digit = True
+                        except:
+                            is_digit = True
+
+                    if not is_digit and interval_value != "!pop_entry":
                         error_message(dm, convo)
                         continue
                     if interval_value != "!pop_entry":
