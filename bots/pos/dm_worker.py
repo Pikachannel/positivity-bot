@@ -106,7 +106,7 @@ async def check_dms(client, json_queue, account_did):
                         error_message(dm, convo)
                         continue
                     if interval_value != "!pop_entry":
-                        interval_value = int(interval_value)
+                        interval_value = float(interval_value)
                         if interval_value < 0 or interval_value > 3600:
                             error_message(dm, convo)
                             continue
@@ -115,7 +115,7 @@ async def check_dms(client, json_queue, account_did):
                     interval_data = {
                         "type": "update",
                         "user_did": user_did,
-                        "interval": interval_value
+                        "interval": float(str(interval_value)[:5]) if interval_value != "!pop_entry" else "!pop_entry"
                     }
 
                     await json_queue.put(interval_data)
