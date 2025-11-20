@@ -84,7 +84,7 @@ async def check_dms(client, json_queue, account_did):
                     await json_queue.put(chance_data)
 
                     if chance_value != "!pop_entry":
-                        dm_text = f"The chance of a reply under your posts is now'{chance_value}%'!\nYou can change this at anytime by sending the same command."
+                        dm_text = f"The chance of a reply under your posts is now '{chance_value}%'!\nYou can change this at anytime by sending the same command."
                     else:
                         dm_text = "The chance of a reply under your posts has been reset to 100%."
 
