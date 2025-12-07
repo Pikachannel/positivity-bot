@@ -1,9 +1,10 @@
 # -------- Imports --------
 import asyncio
 from datetime import datetime 
+from atproto import Client
 
 # -------- Refresh Followers Function --------
-async def refresh_followers(client, followers_set, account_did, per_page=100):
+async def refresh_followers(client: Client, followers_set: set, account_did: str, per_page: int = 100) -> None:
     # -- Start function
     while True:
         try:
