@@ -24,6 +24,7 @@ USER_DATA_PATH = "bots/data/user_data.json"
 
 # -- Setup followers
 followers_set = set()
+ws = Websocket()
 
 # -------- Load json files --------
 with open(MESSAGES_JSON_PATH, "r", encoding="utf-8") as f:
@@ -33,9 +34,9 @@ with open(USER_DATA_PATH, "r", encoding="utf-8") as f:
     user_data = json.load(f)
 
 # ------ Main Function --------
-async def main():
+async def main() -> None:
     # -- Setup client connection
-    client, profile = await login(HANDLE, PASSWORD)
+    client = await login(HANDLE, PASSWORD)
     if not client:
         input("[Run Positive] Press enter to exit...")
         return
@@ -46,12 +47,11 @@ async def main():
 
     # -- Start all functions as background tasks
     asyncio.create_task(refresh_followers(client, followers_set, ACCOUNT_DID))
-    asyncio.create_task(check_dms(client, json_queue, ACCOUNT_DID))
+    asyncio.create_task(check_dms(client, json_queue, ACCOUNT_DID, user_data))
     for _ in range(3):
         asyncio.create_task(worker(client, queue, followers_set, ACCOUNT_DID, messages, user_data))
     
     asyncio.create_task(json_worker(USER_DATA_PATH, json_queue, user_data))
 
     # -- Setup websocket connection to the bsky jetstream
-    ws = Websocket()
     await ws.connect(queue)
