@@ -1,8 +1,9 @@
 # -------- Imports --------
 import json
+import asyncio
 
 # -------- Json Worker Function --------
-async def json_worker(path, queue, user_data):
+async def json_worker(path: str, queue: asyncio.Queue[dict], user_data: dict) -> None:
     # -- Start function
     print("[JSON Worker] Worker starting")
     while True:
