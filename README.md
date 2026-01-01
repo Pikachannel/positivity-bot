@@ -86,7 +86,7 @@ If you would like your data deleted from the bot, there are two options:
 
 **Manual Deletion:**  
   1. Contact Pikachannel via:  
-     - Bluesky: [pikachannel.skittlesquad.xyz](https://bsky.app/profile/ashley.skittlesquad.xyz)  
+     - Bluesky: [pikachannel-dev.bsky.social](https://bsky.app/profile/pikachannel-dev.bsky.social)  
      - Email: pikachannel.dev@gmail.com  
   2. Await confirmation that your data has been deleted from the bot's storage.
 
