@@ -9,6 +9,8 @@ post_dict = {}
 async def make_post(client: Client, post_cid: str, post_uri: str, user_did: str, messages: dict, user_data: dict, lang: str = "en") -> None:
     global post_dict
 
+    messages = messages[lang]
+
     # -- Check the post interval
     post_interval = user_data.get(user_did, {}).get("interval", 0)
     if user_did in post_dict and post_interval > 0:
