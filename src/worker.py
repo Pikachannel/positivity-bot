@@ -16,7 +16,7 @@ async def worker(client: Client , queue: asyncio.Queue[dict], followers_set: set
             eventType = message.get("commit", {}).get("collection")
             eventOperation = message.get("commit", {}).get("operation")
 
-        # -- Check if the event type
+            # -- Check the event type
             if eventType == "app.bsky.graph.follow":
                 if eventOperation == "create":
  
@@ -46,3 +46,4 @@ async def worker(client: Client , queue: asyncio.Queue[dict], followers_set: set
             print(f"[BSKY Worker] An error has occured, {e}")
         finally:
             queue.task_done() # Remove the task from the queue
+
