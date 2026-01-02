@@ -15,7 +15,8 @@ This bot responds to users' posts with positive messages!
 2. **Deleting replies**: Users can delete a reply sent by the bot by replying with "delete".
 3. **Custom nicknames**: Users can set a custom nickname instead of using their Bluesky display name.
 4. **Post chance**: Users can change the chance of a reply being made under their post.
-5. **Post interval**: Users can change the amount of time in between replies being able to be made under their posts.
+5. **Post interval (time)**: Users can change the amount of time in between replies being able to be made under their posts.
+6. **Post interval (posts)**: Users can change the amount of posts in between replies being able to be made under their posts.
 
 ### How to use
 1. Follow the bot on Bluesky.
@@ -47,13 +48,21 @@ To view all your settings:
 2. Wait for the bot to respond **before** sending a new message.
    - Responses may take up to 5 minutes.
 
-#### Post interval
+#### Post interval (time)
 1. Send a direct message to the bot in the format:
   - **Setting Static Interval:** `!interval insert_interval_here` (must be a number between 0 and 3600)
   - **Setting Variable Interval:** `!interval lower_bound-upper_bound` (both numbers must be between 0 and 3600)
   - **Resetting Interval:** `!interval`
 2. Wait for the bot to respond **before** sending a new message.
-   - Responses may take up to 5 minutes.
+   - Responses may take up to 5 minutes
+
+#### Post interval (posts)
+1. Send a direct message to the bot in the format:
+   - **Setting Static Interval:** `!interval_posts insert_interval_here` (must be a integer between 0 and 50)
+   - **Setting Variable Interval:** `!interval_posts lower_bound-upper_bound` (both integers must be between 0 and 50)
+   - **Resetting Interval:** `!interval_posts`
+2. Wait for the bot to respond **before** sending a new message.
+   - Responses may take up to 5 minutes
 
 ## Privacy Policy
 
