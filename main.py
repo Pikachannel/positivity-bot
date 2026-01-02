@@ -4,6 +4,7 @@ from src.followers import refresh_followers
 from src.worker import worker
 from src.dm_worker import DmWorker
 from src.settings import CommandManager
+from src.post import PostManager
 from src.client import login
 from src.json_worker import json_worker
 import asyncio
@@ -49,12 +50,13 @@ async def main() -> None:
     ws = Websocket()
     command_manager = CommandManager(user_data, json_queue)
     dm_worker = DmWorker(client, command_manager, json_queue, ACCOUNT_DID)
+    post_manager = PostManager()
 
     # -- Start all functions as background tasks
     asyncio.create_task(refresh_followers(client, followers_set, ACCOUNT_DID))
     asyncio.create_task(dm_worker.start())
     for _ in range(3):
-        asyncio.create_task(worker(client, queue, followers_set, ACCOUNT_DID, messages, user_data))
+        asyncio.create_task(worker(client, queue, followers_set, ACCOUNT_DID, messages, user_data, post_manager))
     
     asyncio.create_task(json_worker(USER_DATA_PATH, json_queue, user_data))
 
