@@ -61,10 +61,10 @@ class CommandManager:
 
         chance_value = self.to_float(chance)
         if chance_value is None:
-            return False, "An error occured while updating your chance setting.\nPlease make sure you only use numbers.\nnUse !help at any time to see all commands."
+            return False, "An error occurred while updating your chance setting.\nPlease make sure you only use numbers.\nUse !help at any time to see all commands."
 
         if chance_value < 0 or chance_value > 100:
-            return False, "An error occured while updating your chance setting.\nPlease make sure your chance is in the range 0-100.\nnUse !help at any time to see all commands."
+            return False, "An error occurred while updating your chance setting.\nPlease make sure your chance is in the range 0-100.\nUse !help at any time to see all commands."
 
         chance_value = round(chance_value, 2)
 
@@ -97,18 +97,18 @@ class CommandManager:
             interval_value_2 = self.to_float(intervalSplit[1])
 
             if interval_value_1 is None or interval_value_2 is None:
-                return False, "An error occured while updating your interval setting.\nPlease make sure you only use numbers.\nnUse !help at any time to see all commands."
+                return False, "An error occurred while updating your interval setting.\nPlease make sure you only use numbers.\nUse !help at any time to see all commands."
            
             interval_format_1, interval_format_2 = round(interval_value_1, 2), round(interval_value_2, 2)
          
             if interval_format_1 > interval_format_2:
-                return False, "An error occured while updating your interval setting.\Please make sure your interval is in the range '0-3600'.\nnUse !help at any time to see all commands."
+                return False, "An error occurred while updating your interval setting.\Please make sure your first value is less then your second value.\nUse !help at any time to see all commands."
 
             if interval_format_1 < 0 or interval_format_2 < 0:
-                return False, "An error occured while updating your interval setting.\Please make sure your first value is less then your second value.\nnUse !help at any time to see all commands."
+                return False, "An error occurred while updating your interval setting.\Please make sure your interval is in the range '0-3600'.\nUse !help at any time to see all commands."
 
             if interval_format_2 > 3600:
-                return False, "An error occured while updating your interval setting.\Please make sure your interval is in the range '0-3600'.\nnUse !help at any time to see all commands."
+                return False, "An error occurred while updating your interval setting.\Please make sure your interval is in the range '0-3600'.\nUse !help at any time to see all commands."
 
             final_value = [interval_format_1, interval_format_2]
             text_value = f"{interval_format_1}-{interval_format_2}"
@@ -118,10 +118,10 @@ class CommandManager:
             interval_value = self.to_float(interval)
 
             if interval_value is None:
-                return False, "An error occured while updating your interval setting.\nPlease make sure you only use numbers.\nnUse !help at any time to see all commands."
+                return False, "An error occurred while updating your interval setting.\nPlease make sure you only use numbers.\Use !help at any time to see all commands."
 
             if interval_value > 3600 or interval_value < 0:
-                return False, "An error occured while updating your interval setting.\nPlease make sure your interval is in the range '0-3600'.\nnUse !help at any time to see all commands."
+                return False, "An error occurred while updating your interval setting.\nPlease make sure your interval is in the range '0-3600'.\Use !help at any time to see all commands."
 
             final_value = [round(interval_value, 2)]
             text_value = round(interval_value, 2)
@@ -139,8 +139,8 @@ class CommandManager:
 
     # -------------
     # -- Interval (posts)
-    # A static number of posts the bot will skip
-    # A ranged interval of posts the bot will skip
+    # A static number of posts the bot will skip, between 0 and 50 posts
+    # A ranged interval of posts the bot will skip, between 0 and 50 posts
     async def interval_posts(self, user_did: str, interval: str | None) -> tuple[bool, str]:
         # -- Validation and mormalisation
         if interval is None:
@@ -155,18 +155,18 @@ class CommandManager:
             interval_value_2 = self.to_float(intervalSplit[1])
 
             if interval_value_1 is None or interval_value_2 is None:
-                return False, "An error occured while updating your interval setting.\nPlease make sure you only use numbers.\nnUse !help at any time to see all commands."
+                return False, "An error occurred while updating your interval setting.\nPlease make sure you only use numbers.\nUse !help at any time to see all commands."
            
             interval_format_1, interval_format_2 = int(interval_value_1), int(interval_value_2)
          
             if interval_format_1 > interval_format_2:
-                return False, "An error occured while updating your interval setting.\Please make sure your interval is in the range '0-50'.\nnUse !help at any time to see all commands."
+                return False, "An error occurred while updating your interval setting.\nPlease make sure your first value is less then your second value.\nUse !help at any time to see all commands."
 
             if interval_format_1 < 0 or interval_format_2 < 0:
-                return False, "An error occured while updating your interval setting.\Please make sure your first value is less then your second value.\nnUse !help at any time to see all commands."
+                return False, "An error occurred while updating your interval setting.\nPlease make sure your interval is in the range '0-50'.\nUse !help at any time to see all commands."
 
             if interval_format_2 > 50:
-                return False, "An error occured while updating your interval setting.\Please make sure your interval is in the range '0-50'.\nnUse !help at any time to see all commands."
+                return False, "An error occurred while updating your interval setting.\nPlease make sure your interval is in the range '0-50'.\nUse !help at any time to see all commands."
 
             final_value = [interval_format_1, interval_format_2]
             text_value = f"{interval_format_1}-{interval_format_2}"
@@ -176,10 +176,10 @@ class CommandManager:
             interval_value = self.to_float(interval)
 
             if interval_value is None:
-                return False, "An error occured while updating your interval setting.\nPlease make sure you only use numbers.\nnUse !help at any time to see all commands."
+                return False, "An error occurred while updating your interval setting.\nPlease make sure you only use numbers.\Use !help at any time to see all commands."
 
             if interval_value > 50 or interval_value < 0:
-                return False, "An error occured while updating your interval setting.\nPlease make sure your interval is in the range '0-50'.\nnUse !help at any time to see all commands."
+                return False, "An error occurred while updating your interval setting.\nPlease make sure your interval is in the range '0-50'.\Use !help at any time to see all commands."
 
             final_value = [int(interval_value)]
             text_value = int(interval_value)
@@ -194,7 +194,7 @@ class CommandManager:
         await self.json_queue.put(payload)
 
         return True, f"Your interval has been updated to '{text_value}' posts\nYou can change this at any time by sending the same command.\nUse !help at any time to see all commands."
-
+        
     # -------------
     # -- Delete
     # Delete all the users' settings
@@ -207,19 +207,30 @@ class CommandManager:
 
         await self.json_queue.put(payload)
 
-        return True, "Your settings have been deleted.\nYour can confirm this by using '!settings'.\nnnUse !help at any time to see all commands."
+        return True, "Your settings have been deleted.\nYour can confirm this by using '!settings'.\nUse !help at any time to see all commands."
 
     # -------------
     # -- Settings
     # View a users' settings
     async def view_settings(self, user_did: str) -> tuple[bool, str]:
+        # -- Settings helper
+        def format_value(self, value):
+            if isinstance(value, list):
+                return f"{value[0]}-{value[1]}" if len(value) == 2 else value[0]
+            return value
+
         # -- Get settings
         user_settings = self.user_data.get(user_did, {})
       
         if not user_settings:
             return False, "You have no settings configured with the bot.\nUse !help to see options for settings!"
       
-        format_settings = "\n".join(f"{key.capitalize()}: {value}" for key, value in user_settings.items())
+
+
+        format_settings = "\n".join(
+            f"{key.capitalize()}: {format_value(value)}"
+            for key, value in user_settings.items()
+        )
         return True, f"Your settings can be seen below!\n{format_settings}"
 
     # -------------
