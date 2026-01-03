@@ -62,6 +62,8 @@ class DmWorker:
                 _, msg_to_send = await self.command_manager.chance(user_did, param)
             elif command == "!interval":
                 _, msg_to_send = await self.command_manager.interval_time(user_did, param)
+            elif command == "!skip":
+                _, msg_to_send = await self.command_manager.skip_posts(user_did, param)
             elif command == "!delete":
                 _, msg_to_send = await self.command_manager.delete_settings(user_did)
             elif command == "!settings":
