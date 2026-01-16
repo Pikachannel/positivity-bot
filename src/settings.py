@@ -6,7 +6,7 @@ class CommandManager:
     def __init__(self, user_data: dict, json_queue: asyncio.Queue) -> None:
         self.user_data = user_data
         self.json_queue = json_queue
-    
+
     # -------------
     # -- To float
     # Converts a string to a float
@@ -22,9 +22,9 @@ class CommandManager:
     async def remove_setting(self, user_did: str, setting: str) -> tuple[bool, str]:
         # -- Add to queue
         payload = {
-            "type": "update",
+            "type": "remove",
             "user_did": user_did,
-            setting: "!pop_entry"
+            "setting": setting
         }
 
         await self.json_queue.put(payload)
@@ -80,10 +80,10 @@ class CommandManager:
         return True, f"The chance of a reply under your posts has been updated to '{chance_value}%'\nYou can change this at any time by sending the same command.\nUse !help at any time to see all commands."
 
     # -------------
-    # -- Interval (time)
+    # -- Interval
     # A static interval with max time of 3600 seconds
     # A ranged interval between 0 and 3600 seconds
-    async def interval_time(self, user_did: str, interval: str | None) -> tuple[bool, str]:
+    async def interval(self, user_did: str, interval: str | None) -> tuple[bool, str]:
         # -- Validation and mormalisation
         if interval is None:
             return await self.remove_setting(user_did, "interval")
@@ -118,10 +118,10 @@ class CommandManager:
             interval_value = self.to_float(interval)
 
             if interval_value is None:
-                return False, "An error occurred while updating your interval setting.\nPlease make sure you only use numbers.\Use !help at any time to see all commands."
+                return False, "An error occurred while updating your interval setting.\nPlease make sure you only use numbers.\nUse !help at any time to see all commands."
 
             if interval_value > 3600 or interval_value < 0:
-                return False, "An error occurred while updating your interval setting.\nPlease make sure your interval is in the range '0-3600'.\Use !help at any time to see all commands."
+                return False, "An error occurred while updating your interval setting.\nPlease make sure your interval is in the range '0-3600'.\nUse !help at any time to see all commands."
 
             final_value = [round(interval_value, 2)]
             text_value = round(interval_value, 2)
@@ -259,4 +259,3 @@ class CommandManager:
         }
 
         return True, text, facet
-
