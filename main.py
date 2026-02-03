@@ -43,14 +43,14 @@ async def main() -> None:
         return
 
     # -- Create queues
-    queue = asyncio.Queue()
-    json_queue = asyncio.Queue()
+    queue = asyncio.Queue(maxsize=300)
+    json_queue = asyncio.Queue(maxsize=50)
 
     # -- Setup classes
     ws = Websocket()
     command_manager = CommandManager(user_data, json_queue)
     dm_worker = DmWorker(client, command_manager, json_queue, ACCOUNT_DID)
-    post_manager = PostManager()
+    post_manager = PostManager(client, user_data, ACCOUNT_DID, messages)
 
     # -- Start all functions as background tasks
     asyncio.create_task(refresh_followers(client, followers_set, ACCOUNT_DID))
@@ -62,3 +62,4 @@ async def main() -> None:
 
     # -- Setup websocket connection to the bsky jetstream
     await ws.connect(queue)
+
