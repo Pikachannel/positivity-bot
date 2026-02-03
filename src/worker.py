@@ -4,8 +4,10 @@ from atproto import Client
 from typing import Any
 
 # -------- Worker Function --------
-async def worker(client: Client , queue: asyncio.Queue[dict], followers_set: set, account_did: str, messages: dict, user_data: dict, post_manager: Any) -> None:
+async def worker(client: Client , queue: asyncio.Queue[dict], followers_set: set[str], account_did: str, messages: dict, user_data: dict, post_manager: Any) -> None:
     print("[BSKY Worker] Worker starting")
+    first_reply = set()
+
     # -- Start Worker
     while True:
         message = await queue.get() # Get new messages as they're added to the queue
@@ -21,6 +23,7 @@ async def worker(client: Client , queue: asyncio.Queue[dict], followers_set: set
  
                     if message.get("commit", {}).get("record", {}).get("subject", {}) == account_did: # Check if the user follows the bot
                         followers_set.add(user_did) # Add user to the follow set 
+                        first_reply.add(user_did)
 
             if eventType != "app.bsky.feed.post" or eventOperation != "create": # Skip everything but posts
                 continue 
@@ -29,7 +32,7 @@ async def worker(client: Client , queue: asyncio.Queue[dict], followers_set: set
                 continue
 
             if message.get("commit", {}).get("record", {}).get("reply", {}): # Only handle delete requests for replies
-                await post_manager.delete_post(client, message, account_did, user_did)
+                await post_manager.delete_post(message, user_did)
                 continue
 
             # -- Extract post cid and uri
@@ -38,8 +41,15 @@ async def worker(client: Client , queue: asyncio.Queue[dict], followers_set: set
             post_uri = f"at://{user_did}/app.bsky.feed.post/{post_rkey}"
             post_text = message.get("commit", {}).get("record", {}).get("text", None)
 
+            # -- Check if this is the users' first post after following
+
+            if str(user_did) in first_reply:
+                first_reply.remove(user_did)
+                await post_manager.first_reply(post_cid, post_uri, user_did)
+                continue
+
             # -- Make the post
-            await post_manager.make_post(client, post_cid, post_uri, user_did, post_text, messages, user_data)
+            await post_manager.make_post(post_cid, post_uri, user_did, post_text)
 
         except Exception as e:
             print(f"[BSKY Worker] An error has occured, {e}")
