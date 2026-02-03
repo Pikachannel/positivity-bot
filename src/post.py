@@ -5,14 +5,19 @@ import time
 
 # -------- Post Manager Class --------
 class PostManager:
-    def __init__(self) -> None:
+    def __init__(self, client: Client, user_data: dict, account_did: str, messages: dict) -> None:
+        self.client = client
+        self.user_data = user_data
+        self.account_did = account_did
+        self.messages = messages
+
         self.post_times: dict[str, float] = {}
         self.post_numbers: dict[str, int] = {}
 
     # -------------
     # -- Interval (time) check
-    def interval_time_check(self, user_did: str, user_data: dict) -> bool:
-        intervals = user_data.get(user_did, {}).get("interval", [])
+    def interval_time_check(self, user_did: str) -> bool:
+        intervals = self.user_data.get(user_did, {}).get("interval", [])
         if not intervals:
             return True
 
@@ -30,8 +35,8 @@ class PostManager:
 
     # -------------
     # -- SKip post check
-    def skip_posts_check(self, user_did: str, user_data: dict) -> bool:
-        intervals = user_data.get(user_did, {}).get("skip", [])
+    def skip_posts_check(self, user_did: str) -> bool:
+        intervals = self.user_data.get(user_did, {}).get("skip", [])
         if not intervals:
             return True
 
@@ -50,12 +55,12 @@ class PostManager:
         skip = intervals[0] if len(intervals) == 1 else random.randint(intervals[0], intervals[1])
         self.post_numbers[user_did] = skip
 
-        return True     
-        
+        return True        
+
     # -------------
     # -- Chance check
-    def chance_check(self, user_did: str, user_data: dict) -> bool:
-        post_chance = user_data.get(user_did, {}).get("chance", 100)
+    def chance_check(self, user_did: str) -> bool:
+        post_chance = self.user_data.get(user_did, {}).get("chance", 100)
         if random.uniform(0, 100) > post_chance:
             print(f"[Post] Skipping post for {user_did} due to post chance ({post_chance}%)")
             return False
@@ -63,13 +68,13 @@ class PostManager:
 
     # -------------
     # -- Get nickname
-    def get_nickname(self, client: Client, user_did: str, user_data: dict) -> str:
-        nickname = user_data.get(user_did, {}).get("nickname")
+    def get_nickname(self, user_did: str) -> str:
+        nickname = self.user_data.get(user_did, {}).get("nickname")
 
         if nickname:
             return nickname
 
-        profile = client.get_profile(user_did)
+        profile = self.client.get_profile(user_did)
         return (
             profile.display_name
             or profile.handle.split(".")[0]
@@ -77,21 +82,21 @@ class PostManager:
 
     # -------------
     # -- Make post
-    async def make_post(self, client: Client, post_cid: str, post_uri: str, user_did: str, post_text: str, messages: dict, user_data: dict, lang: str = "en") -> None:
-        messages = messages[lang]
+    async def make_post(self, post_cid: str, post_uri: str, user_did: str, post_text: str, lang: str = "en") -> None:
+        messages = self.messages[lang]
 
         # -- Check if the post can be made
-        if not self.interval_time_check(user_did, user_data):
+        if not self.interval_time_check(user_did):
             return
 
-        if not self.skip_posts_check(user_did, user_data):
+        if not self.skip_posts_check(user_did):
             return
 
-        if not self.chance_check(user_did, user_data):
+        if not self.chance_check(user_did):
             return
 
         # -- Buld the post
-        nickname = self.get_nickname(client, user_did, user_data)
+        nickname = self.get_nickname(user_did)
 
         random_message = random.choice(messages)
         formatted_message = random_message.format(display_name=nickname)
@@ -100,7 +105,7 @@ class PostManager:
         builder.text(formatted_message)
 
         # -- Make the post
-        post = client.send_post(
+        post = self.client.send_post(
             builder,
             reply_to={
                 "parent": {"cid": post_cid, "uri": post_uri},
@@ -109,10 +114,34 @@ class PostManager:
         )
 
         print(f"[Post] Post made ({post.uri})")
-    
+
+    # -------------
+    # -- First reply post
+    async def first_reply(self, post_cid: str, post_uri: str, user_did: str, lang: str = "en"):
+        # -- Format reply
+        builder = client_utils.TextBuilder()
+        
+        builder.text("Thank you for following!\nSee the bots ")
+        builder.link(
+            "github",
+            "https://github.com/Pikachannel/positivity-bot/blob/main/README.md"
+        )
+        builder.text(" for a full list of settings you can configure with me.")
+
+        # -- Make the post
+        post = self.client.send_post(
+            builder,
+            reply_to={
+                "parent": {"cid": post_cid, "uri": post_uri},
+                "root": {"cid": post_cid, "uri": post_uri}
+            }
+        )
+
+        print(f"[Post] Post made ({post.uri})")
+        
     # -------------
     # -- Delete post
-    async def delete_post(self, client: Client, message: dict, account_did: str, user_did: str) -> None:
+    async def delete_post(self, message: dict, user_did: str) -> None:
         # -- Get all post information 
         commit = message.get("commit", {})
         record = commit.get("record", {})
@@ -125,7 +154,7 @@ class PostManager:
         parentDID, parentKEY = parent.get("uri", "").split('at://')[1].split('/app.bsky.feed.post/')
 
         # -- Check if the original post belongs to the user and the reply belongs to the bot
-        if user_did == rootDID and account_did == parentDID:
+        if user_did == rootDID and self.account_did == parentDID:
             if record.get("text", "").lower() == "delete":
-                client.delete_post(parent.get("uri", "")) # Delete the post
+                self.client.delete_post(parent.get("uri", "")) # Delete the post
                 print(f"[Delete] Post deleted from {user_did}")
