@@ -2,10 +2,11 @@
 import random
 from atproto import Client, client_utils
 import time
+from typing import Any
 
 # -------- Post Manager Class --------
 class PostManager:
-    def __init__(self, client: Client, user_data: dict, account_did: str, messages: dict) -> None:
+    def __init__(self, client: Client, user_data: dict, account_did: str, messages: dict, filters: Any) -> None:
         self.client = client
         self.user_data = user_data
         self.account_did = account_did
@@ -14,12 +15,14 @@ class PostManager:
         self.post_times: dict[str, float] = {}
         self.post_numbers: dict[str, int] = {}
 
+        self.filters = filters
+
+
+
     # -------------
     # -- Interval (time) check
     def interval_time_check(self, user_did: str) -> bool:
         intervals = self.user_data.get(user_did, {}).get("interval", [])
-        if not intervals:
-            return True
 
         now = time.time()
         next_allowed = self.post_times.get(user_did, 0)
@@ -29,7 +32,12 @@ class PostManager:
             print(f"[Post] Skipping post for {user_did} ({remaining:.2f}s remaining)")
             return False
 
-        interval = intervals[0] if len(intervals) == 1 else random.uniform(intervals[0], intervals[1])
+        if len(intervals) != 0:
+            interval = intervals[0] if len(intervals) == 1 else random.uniform(intervals[0], intervals[1])
+        else:
+            interval = 0
+        if interval < 60:
+            interval = 60
         self.post_times[user_did] = now + interval
         return True
 
@@ -67,6 +75,27 @@ class PostManager:
         return True
 
     # -------------
+    # -- Filters check
+    def filters_check(self, message: dict, user_did: str) -> bool:
+        if self.filters.keywords(message):
+            print(f"[Post] Skipping post for {user_did} due to keywords")
+            return False
+
+        if self.filters.links(message):
+            print(f"[Post] Skipping post for {user_did} due to links")
+            return False
+
+        if self.filters.account_flags(user_did):
+            print(f"[Post] Skipping post for {user_did} due to account flags")
+            return False
+
+        if self.filters.post_flags(message.get("commit", {}).get("record", {}).get("uri", "")):
+            print(f"[Post] Skipping post for {user_did} due to post flags")
+            return False
+
+        return True
+
+    # -------------
     # -- Get nickname
     def get_nickname(self, user_did: str) -> str:
         nickname = self.user_data.get(user_did, {}).get("nickname")
@@ -82,11 +111,14 @@ class PostManager:
 
     # -------------
     # -- Make post
-    async def make_post(self, post_cid: str, post_uri: str, user_did: str, post_text: str, lang: str = "en") -> None:
+    async def make_post(self, message: dict, post_cid: str, post_uri: str, user_did: str, post_text: str, lang: str = "en") -> None:
         messages = self.messages[lang]
 
         # -- Check if the post can be made
         if not self.interval_time_check(user_did):
+            return
+
+        if not self.filters_check(message, user_did):
             return
 
         if not self.skip_posts_check(user_did):
@@ -94,6 +126,8 @@ class PostManager:
 
         if not self.chance_check(user_did):
             return
+
+
 
         # -- Buld the post
         nickname = self.get_nickname(user_did)
