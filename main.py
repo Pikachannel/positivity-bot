@@ -5,6 +5,7 @@ from src.worker import worker
 from src.dm_worker import DmWorker
 from src.settings import CommandManager
 from src.post import PostManager
+from src.filters import Filters
 from src.client import login
 from src.json_worker import json_worker
 import asyncio
@@ -50,7 +51,10 @@ async def main() -> None:
     ws = Websocket()
     command_manager = CommandManager(user_data, json_queue)
     dm_worker = DmWorker(client, command_manager, json_queue, ACCOUNT_DID)
-    post_manager = PostManager(client, user_data, ACCOUNT_DID, messages)
+
+    filters = Filters()
+
+    post_manager = PostManager(client, user_data, ACCOUNT_DID, messages, filters)
 
     # -- Start all functions as background tasks
     asyncio.create_task(refresh_followers(client, followers_set, ACCOUNT_DID))
@@ -62,4 +66,3 @@ async def main() -> None:
 
     # -- Setup websocket connection to the bsky jetstream
     await ws.connect(queue)
-
