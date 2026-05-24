@@ -1,7 +1,7 @@
 # Bluesky-bots
 
 ## Overview
-This repository contains all the code for Whimsy Miku Bot (positivitybot.bsky.social)!
+This repository contains all the code for Whimsy Miku Bot (whimsy.pikachannel.xyz)!
 
 --- 
 
@@ -12,15 +12,34 @@ This bot responds to users' posts with positive messages!
 1. **Randomly chosen preset messages**, including:
    - English messages.
    - Messages that include the user's name.
-2. **Deleting replies**: Users can delete a reply sent by the bot by replying with "delete".
+2. **Content Filtering System**, including:
+   - A post filter system
+   - Allowing users to delete replies under their posts by replying with "delete"
 3. **Custom nicknames**: Users can set a custom nickname instead of using their Bluesky display name.
 4. **Post chance**: Users can change the chance of a reply being made under their post.
-5. **Post interval**: Users can change the amount of time in between replies being able to be made under their posts.
+5. **Post interval**: Users can change the amount of time in between replies being able to be made under their posts. All replies are subject to a minimum 60 second cooldown.
 6. **Skip posts**: Users can change the amount of posts in between replies being able to be made under their posts.
 
 ### How to use
 1. Follow the bot on Bluesky.
    - If you unfollow or block the bot, it may take up to 5 minutes for this to register and for replies to stop.
+
+### Content Filtering System
+
+#### Filter system
+The system skips replies when any of the following conditions are met:
+
+**Post content checks:**
+1. Detects whether a post contains any predefined keywords  
+2. Detects whether a post contains a link or embed
+
+**Account-level checks:**
+1. Checks if the poster's account has been flagged by Bluesky moderation
+
+**Post-level checks:**
+1. Detects Bluesky post labels, including:
+   - self-applied labels
+   - Bluesky moderation labels
 
 #### Deleting posts
 1. Find a reply made under one of your posts.
@@ -50,8 +69,8 @@ To view all your settings:
 
 #### Post interval
 1. Send a direct message to the bot in the format:
-  - **Setting Static Interval:** `!interval insert_interval_here` (must be a number between 0 and 3600)
-  - **Setting Variable Interval:** `!interval lower_bound-upper_bound` (both numbers must be between 0 and 3600)
+  - **Setting Static Interval:** `!interval insert_interval_here` (must be a number between 60 and 3600)
+  - **Setting Variable Interval:** `!interval lower_bound-upper_bound` (both numbers must be between 60 and 3600)
   - **Resetting Interval:** `!interval`
 2. Wait for the bot to respond **before** sending a new message.
    - Responses may take up to 5 minutes
@@ -96,7 +115,7 @@ If you would like your data deleted from the bot, there are two options:
 
 **Manual Deletion:**  
   1. Contact Pikachannel via:  
-     - Bluesky: [pikachannel-dev.bsky.social](https://bsky.app/profile/pikachannel-dev.bsky.social)  
+     - Bluesky: [pikachannel.xyz](https://bsky.app/profile/pikachannel.xyz)  
      - Email: pikachannel.dev@gmail.com  
   2. Await confirmation that your data has been deleted from the bot's storage.
 
