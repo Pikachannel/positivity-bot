@@ -89,7 +89,7 @@ class PostManager:
             print(f"[Post] Skipping post for {user_did} due to account flags")
             return False
 
-        if self.filters.post_flags(message.get("commit", {}).get("record", {}).get("uri", "")):
+        if self.filters.post_flags(message, message.get("commit", {}).get("record", {}).get("uri", "")):
             print(f"[Post] Skipping post for {user_did} due to post flags")
             return False
 
