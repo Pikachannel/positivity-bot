@@ -104,7 +104,7 @@ class CommandManager:
             if interval_format_1 > interval_format_2:
                 return False, "An error occurred while updating your interval setting.\Please make sure your first value is less then your second value.\nUse !help at any time to see all commands."
 
-            if interval_format_1 < 0 or interval_format_2 < 0:
+            if interval_format_1 < 60 or interval_format_2 < 60:
                 return False, "An error occurred while updating your interval setting.\Please make sure your interval is in the range '0-3600'.\nUse !help at any time to see all commands."
 
             if interval_format_2 > 3600:
