@@ -52,7 +52,7 @@ async def main() -> None:
     command_manager = CommandManager(user_data, json_queue)
     dm_worker = DmWorker(client, command_manager, json_queue, ACCOUNT_DID)
 
-    filters = Filters()
+    filters = Filters(client)
 
     post_manager = PostManager(client, user_data, ACCOUNT_DID, messages, filters)
 
