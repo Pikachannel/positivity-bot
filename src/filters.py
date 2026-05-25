@@ -4,19 +4,21 @@ import time
 
 # -------- Filters Class --------
 class Filters:
-    def __init__(self):
-        self.cache = {} # user_did: (labels, timestamp)
+    def __init__(self) -> None:
+        self.cache = {}
         self.session = requests.Session()
 
         # -- Load keyword list
         with open("data/blocklist.txt", "r") as f:
             self.keyword_list = {line.strip().lower() for line in f}
 
+    # -------------
     # -- Flag keywords
     def keywords(self, message):
         text = message.get("commit", {}).get("record", {}).get("text", "").lower()
         return any(keyword in text for keyword in self.keyword_list)
 
+    # -------------
     # -- Flag links
     def links(self, message):
         embed = message.get("commit", {}).get("record", {}).get("embed", {})
@@ -30,6 +32,7 @@ class Filters:
 )
         return embed.get("$type") == "app.bsky.embed.external" or has_link
 
+    # -------------
     # -- Flag accounts with Bsky labels
     def account_flags(self, user_did):
 
@@ -50,12 +53,19 @@ class Filters:
         data = response.json()
         labels = data.get("labels", [])
 
-        flagged = len(labels) > 0  
+        ammount = 0
+        for label in labels:
+            if label.get("src") == "did:plc:ar7c4by46qjdydhdevvrndac":
+                ammount += 1
+
+        flagged = ammount > 0
+    
 
         self.cache[user_did] = (flagged, time.time())
 
         return flagged
     
+    # -------------
     # -- Flag posts with Bsky labels
     def post_flags(self, message, post_uri):
         # -- Check message for self labels
