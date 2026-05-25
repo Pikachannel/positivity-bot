@@ -1,18 +1,19 @@
 # -------- Imports --------
 import requests
 import time
+from typing import Any
 
 # -------- Filters Class --------
 class Filters:
-    def __init__(self) -> None:
+    def __init__(self, client: Any) -> None:
         self.cache = {}
         self.session = requests.Session()
+        self.client = client
 
         # -- Load keyword list
         with open("data/blocklist.txt", "r") as f:
             self.keyword_list = {line.strip().lower() for line in f}
-
-    # -------------
+        
     # -- Flag keywords
     def keywords(self, message):
         text = message.get("commit", {}).get("record", {}).get("text", "").lower()
@@ -34,36 +35,24 @@ class Filters:
 
     # -------------
     # -- Flag accounts with Bsky labels
-    def account_flags(self, user_did):
-
+    def account_flags(self, user_did: str):
         # -- Check for cached flags
         if user_did in self.cache:
             flagged, timestamp = self.cache[user_did]
             if time.time() - timestamp < 3600:
                 return flagged
 
-        # -- Check Bsky API for labels
-        url = "https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile"
+        # -- Check for labels
+        try:
+            profile =self.client.get_profile(user_did)
+            labels = profile.labels or []
+            
+            flagged = any(label.src == "did:plc:ar7c4by46qjdydhdevvrndac" for label in labels)
 
-        response = self.session.get(url, params={"actor": user_did}, timeout=5)
-
-        if response.status_code != 200:
+            self.cache[user_did] = (flagged, time.time())
+            return flagged
+        except Exception as e:
             return False
-
-        data = response.json()
-        labels = data.get("labels", [])
-
-        ammount = 0
-        for label in labels:
-            if label.get("src") == "did:plc:ar7c4by46qjdydhdevvrndac":
-                ammount += 1
-
-        flagged = ammount > 0
-    
-
-        self.cache[user_did] = (flagged, time.time())
-
-        return flagged
     
     # -------------
     # -- Flag posts with Bsky labels
@@ -73,23 +62,19 @@ class Filters:
         if post_labels == "com.atproto.label.defs#selfLabels":
             return True
 
-        # -- Check Bsky API for labels
-        url = "https://public.api.bsky.app/xrpc/app.bsky.feed.getPosts"
+        # -- Check for labels
+        try:
+            posts = self.client.app.bsky.feed.get_posts({"uris": [post_uri]})
 
-        response = self.session.get(url, params={"uris": post_uri}, timeout=5)
+            if not posts.posts:
+                return False
 
-        if response.status_code != 200:
+            post = posts.posts[0]
+            labels = post.labels or []
+
+            flagged = len(labels) > 0
+            return flagged
+
+        except Exception as e:
             return False
 
-        data = response.json()
-
-        posts = data.get("posts", [])
-        if not posts:
-            return False
-
-        post = posts[0]
-        labels = post.get("labels", [])
-
-        flagged = len(labels) > 0 
-
-        return flagged
