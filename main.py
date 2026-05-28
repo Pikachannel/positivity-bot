@@ -17,16 +17,24 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # -- Account info
-HANDLE = os.getenv("HANDLE")
-PASSWORD = os.getenv("PASSWORD")
-ACCOUNT_DID = os.getenv("ACCOUNT_DID")
+HANDLES = [os.getenv("HANDLE"), os.getenv("HANDLE_2")]
+PASSWORDS = [os.getenv("PASSWORD"), os.getenv("PASSWORD_2")]
+ACCOUNT_DIDS = [os.getenv("ACCOUNT_DID"), os.getenv("ACCOUNT_DID_2")]
+
+bots  = {
+    ACCOUNT_DIDS[0]: {},
+    ACCOUNT_DIDS[1]: {}
+}
 
 # -- File paths
 MESSAGES_JSON_PATH = "data/messages.json"
 USER_DATA_PATH = "data/user_data.json"
 
 # -- Setup followers
-followers_set = set()
+followers_set = {
+    ACCOUNT_DIDS[0]: set(),
+    ACCOUNT_DIDS[1]: set()
+}
 
 # -------- Load json files --------
 with open(MESSAGES_JSON_PATH, "r", encoding="utf-8") as f:
@@ -38,31 +46,38 @@ with open(USER_DATA_PATH, "r", encoding="utf-8") as f:
 # ------ Main Function --------
 async def main() -> None:
     # -- Setup client connection
-    client = await login(HANDLE, PASSWORD)
-    if not client:
-        input("[Main] Press enter to exit...")
-        return
+    queues = []
+
+    for i in range(len(ACCOUNT_DIDS)):
+        client = await login(HANDLES[i], PASSWORDS[i])
+        if not client:
+            input("[Main] Press enter to exit...")
+            return
+        bots[ACCOUNT_DIDS[i]]["client"] = client
 
     # -- Create queues
-    queue = asyncio.Queue(maxsize=300)
     json_queue = asyncio.Queue(maxsize=50)
 
     # -- Setup classes
     ws = Websocket()
     command_manager = CommandManager(user_data, json_queue)
-    dm_worker = DmWorker(client, command_manager, json_queue, ACCOUNT_DID)
+    dm_worker = DmWorker(bots, command_manager, json_queue, ACCOUNT_DIDS)
 
     filters = Filters(client)
 
-    post_manager = PostManager(client, user_data, ACCOUNT_DID, messages, filters)
+    post_manager = PostManager(bots, user_data, ACCOUNT_DIDS, messages, filters)
 
-    # -- Start all functions as background tasks
-    asyncio.create_task(refresh_followers(client, followers_set, ACCOUNT_DID))
+    # -- Start global workers
     asyncio.create_task(dm_worker.start())
-    for _ in range(3):
-        asyncio.create_task(worker(client, queue, followers_set, ACCOUNT_DID, messages, user_data, post_manager))
-    
     asyncio.create_task(json_worker(USER_DATA_PATH, json_queue, user_data))
 
+    # -- Start per bot queues and workers
+    for i in range(len(ACCOUNT_DIDS)):
+        queues.append(asyncio.Queue(maxsize=300))
+        asyncio.create_task(refresh_followers(client, followers_set[ACCOUNT_DIDS[i]], ACCOUNT_DIDS[i]))
+        asyncio.create_task(worker(bots[ACCOUNT_DIDS[i]]["client"], queues[i], followers_set[ACCOUNT_DIDS[i]], ACCOUNT_DIDS[i], messages, user_data, post_manager))
+
+
     # -- Setup websocket connection to the bsky jetstream
-    await ws.connect(queue)
+    await ws.connect(queues)
+
