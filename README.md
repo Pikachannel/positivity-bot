@@ -1,12 +1,14 @@
-# Bluesky-bots
+# Bluesky Reply Bots
 
 ## Overview
-This repository contains all the code for Whimsy Miku Bot (whimsy.pikachannel.xyz)!
-
+This repository contains all the code for:
+- Whimsy Miku Bot (whimsy.pikachannel.xyz)
+- Evil Teto Bot (evil.pikachannel.xyz)
 --- 
 
-## Positivity Bot
-This bot responds to users' posts with positive messages!  
+## The Bots!
+Whimsy Miku responds to your posts with positive messages!
+Evil Teto responds to your posts with funny mean messages!
 
 ### Current Features
 1. **Randomly chosen preset messages**, including:
@@ -46,7 +48,7 @@ The system skips replies when any of the following conditions are met:
 2. Reply to it with "delete" and it will be removed instantly.
 
 ### Settings
-You can configure settings with the bot! You do this by sending the appropriate command in the bots dms, these can be seen below.
+You can configure settings with the bots! You do this by sending the appropriate command in the bots dms, these can be seen below. Currently settings are shared between all bots.
 To view all your settings:
 1. Send a direct message to the bot in the format:
    - `!settings`
