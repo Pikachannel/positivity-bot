@@ -214,7 +214,7 @@ class CommandManager:
     # View a users' settings
     async def view_settings(self, user_did: str) -> tuple[bool, str]:
         # -- Settings helper
-        def format_value(self, value):
+        def format_value(value):
             if isinstance(value, list):
                 return f"{value[0]}-{value[1]}" if len(value) == 2 else value[0]
             return value
