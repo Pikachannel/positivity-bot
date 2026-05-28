@@ -8,6 +8,7 @@ This repository contains all the code for:
 
 ## The Bots!
 Whimsy Miku responds to your posts with positive messages!
+
 Evil Teto responds to your posts with funny mean messages!
 
 ### Current Features
