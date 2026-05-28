@@ -21,7 +21,8 @@ async def worker(client: Client , queue: asyncio.Queue[dict], followers_set: set
             if eventType == "app.bsky.graph.follow":
                 if eventOperation == "create":
  
-                    if message.get("commit", {}).get("record", {}).get("subject", {}) == account_did: # Check if the user follows the bot
+                    subject = message.get("commit", {}).get("record", {}).get("subject", None)
+                    if subject == account_did: # Check if the user follows the bot
                         followers_set.add(user_did) # Add user to the follow set 
                         first_reply.add(user_did)
 
@@ -32,7 +33,7 @@ async def worker(client: Client , queue: asyncio.Queue[dict], followers_set: set
                 continue
 
             if message.get("commit", {}).get("record", {}).get("reply", {}): # Only handle delete requests for replies
-                await post_manager.delete_post(message, user_did)
+                await post_manager.delete_post(message, user_did, account_did)
                 continue
 
             # -- Extract post cid and uri
@@ -42,16 +43,16 @@ async def worker(client: Client , queue: asyncio.Queue[dict], followers_set: set
             post_text = message.get("commit", {}).get("record", {}).get("text", None)
 
             # -- Check if this is the users' first post after following
-
             if str(user_did) in first_reply:
                 first_reply.remove(user_did)
-                await post_manager.first_reply(post_cid, post_uri, user_did)
+                await post_manager.first_reply(post_cid, post_uri, user_did, account_did)
                 continue
 
             # -- Make the post
-            await post_manager.make_post(post_cid, post_uri, user_did, post_text)
+            await post_manager.make_post(message, post_cid, post_uri, user_did, post_text, account_did)
 
         except Exception as e:
             print(f"[BSKY Worker] An error has occured, {e}")
         finally:
             queue.task_done() # Remove the task from the queue
+            del message
