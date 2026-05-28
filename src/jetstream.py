@@ -13,8 +13,9 @@ class Websocket():
         self.connected = False
         self.ws = None
 
+    # -------------
     # -- Connect function
-    async def connect(self, queue: asyncio.Queue) -> None:
+    async def connect(self, queues: list) -> None:
         # Try to connect infinitely 
         self.connected = True
         while self.connected:
@@ -29,7 +30,8 @@ class Websocket():
                             message = json.loads(raw_message)
 
                             # Add them to a queue for the worker function
-                            await queue.put(message)
+                            for queue in queues:
+                                await queue.put(message)
                         except json.JSONDecodeError:
                             continue
             except ConnectionClosedError as e:
@@ -39,6 +41,7 @@ class Websocket():
                 print(f"[Websocket] An error has occured, {e} reconnecting shortly...")
                 await asyncio.sleep(self.reconnect) # Wait to reconnect upon error
     
+    # -------------
     # -- Disconnect function
     async def disconnect(self) -> None:
         self.connected = False
