@@ -60,17 +60,20 @@ class DmWorker:
                 msg_to_send = None
                 facet = None
                 if command == "!nickname":
-                    _, msg_to_send = await self.command_manager.update_nickname(user_did, param)
+                    _, msg_to_send = await self.command_manager.update_nickname(user_did, param, account_did)
                 elif command == "!chance":
-                    _, msg_to_send = await self.command_manager.chance(user_did, param)
+                    _, msg_to_send = await self.command_manager.chance(user_did, param, account_did)
                 elif command == "!interval":
-                    _, msg_to_send = await self.command_manager.interval(user_did, param)
+                    _, msg_to_send = await self.command_manager.interval(user_did, param, account_did)
                 elif command == "!skip":
-                    _, msg_to_send = await self.command_manager.skip_posts(user_did, param)
+                    _, msg_to_send = await self.command_manager.skip_posts(user_did, param, account_did)
                 elif command == "!delete":
-                    _, msg_to_send = await self.command_manager.delete_settings(user_did)
+                    _, msg_to_send = await self.command_manager.delete_settings(user_did, account_did)
                 elif command == "!settings":
-                    _, msg_to_send = await self.command_manager.view_settings(user_did)
+                    _, msg_to_send = await self.command_manager.view_settings(user_did, account_did)
+                elif command == "!sync":
+                    other_dids = [did for did in self.account_dids if did != account_did]
+                    _, msg_to_send = await self.command_manager.sync_settings(user_did, param, self.bots, account_did, other_dids)
                 elif command == "!help":
                     _, msg_to_send, facet = await self.command_manager.help()
                 else:
