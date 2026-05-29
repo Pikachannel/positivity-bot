@@ -49,10 +49,17 @@ The system skips replies when any of the following conditions are met:
 2. Reply to it with "delete" and it will be removed instantly.
 
 ### Settings
-You can configure settings with the bots! You do this by sending the appropriate command in the bots dms, these can be seen below. Currently settings are shared between all bots.
+You can configure settings with the bots! You do this by sending the appropriate command in the bots dms, these can be seen below. 
 To view all your settings:
 1. Send a direct message to the bot in the format:
    - `!settings`
+2. Wait for the bot to respond **before** sending a new message.
+   - Responses may take up to 5 minutes.
+
+#### Syncing Settings
+1. Send a direct message to the bot in the format:
+   - **Sync the current bot’s settings with another bot:** `!sync @other_bot_handle`
+   - **Sync all other bots’ settings with the current bot:** `!sync @current_bot_handle`
 2. Wait for the bot to respond **before** sending a new message.
    - Responses may take up to 5 minutes.
 
