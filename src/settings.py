@@ -19,10 +19,11 @@ class CommandManager:
     # -------------
     # -- Remove setting
     # Removes a specific setting
-    async def remove_setting(self, user_did: str, setting: str) -> tuple[bool, str]:
+    async def remove_setting(self, user_did: str, setting: str, account_did: str) -> tuple[bool, str]:
         # -- Add to queue
         payload = {
             "type": "remove",
+            "account_did": account_did,
             "user_did": user_did,
             "setting": setting
         }
@@ -34,16 +35,17 @@ class CommandManager:
     # -------------
     # -- Nickname
     # A string at max 20 characters
-    async def update_nickname(self, user_did: str, nickname: str | None) -> tuple[bool, str]:
+    async def update_nickname(self, user_did: str, nickname: str | None, account_did: str) -> tuple[bool, str]:
         # -- Validation and mormalisation
         if nickname is None:
-            return await self.remove_setting(user_did, "nickname") 
+            return await self.remove_setting(user_did, "nickname", account_did) 
 
         nickname = nickname.strip()[:20]
 
         # -- Add to queue
         payload = {
             "type": "update",
+            "account_did": account_did,
             "user_did": user_did,
             "nickname": nickname
         }
@@ -54,10 +56,10 @@ class CommandManager:
     # -------------
     # -- Chance
     # A float between 0 and 100
-    async def chance(self, user_did: str, chance: str | None) -> tuple[bool, str]:
+    async def chance(self, user_did: str, chance: str | None, account_did: str) -> tuple[bool, str]:
         # -- Validation and mormalisation
         if chance is None:
-            return await self.remove_setting(user_did, "chance")
+            return await self.remove_setting(user_did, "chance", account_did)
 
         chance_value = self.to_float(chance)
         if chance_value is None:
@@ -71,6 +73,7 @@ class CommandManager:
         # -- Add to queue
         payload = {
             "type": "update",
+            "account_did": account_did,
             "user_did": user_did,
             "chance": chance_value
         }
@@ -83,10 +86,10 @@ class CommandManager:
     # -- Interval
     # A static interval with max time of 3600 seconds
     # A ranged interval between 0 and 3600 seconds
-    async def interval(self, user_did: str, interval: str | None) -> tuple[bool, str]:
+    async def interval(self, user_did: str, interval: str | None, account_did: str) -> tuple[bool, str]:
         # -- Validation and mormalisation
         if interval is None:
-            return await self.remove_setting(user_did, "interval")
+            return await self.remove_setting(user_did, "interval", account_did)
     
         # -- Check if the interval is a range or static value
         intervalSplit = interval.split("-")
@@ -105,10 +108,10 @@ class CommandManager:
                 return False, "An error occurred while updating your interval setting.\Please make sure your first value is less then your second value.\nUse !help at any time to see all commands."
 
             if interval_format_1 < 60 or interval_format_2 < 60:
-                return False, "An error occurred while updating your interval setting.\Please make sure your interval is in the range '0-3600'.\nUse !help at any time to see all commands."
+                return False, "An error occurred while updating your interval setting.\Please make sure your interval is in the range '60-3600'.\nUse !help at any time to see all commands."
 
             if interval_format_2 > 3600:
-                return False, "An error occurred while updating your interval setting.\Please make sure your interval is in the range '0-3600'.\nUse !help at any time to see all commands."
+                return False, "An error occurred while updating your interval setting.\Please make sure your interval is in the range '60-3600'.\nUse !help at any time to see all commands."
 
             final_value = [interval_format_1, interval_format_2]
             text_value = f"{interval_format_1}-{interval_format_2}"
@@ -129,6 +132,7 @@ class CommandManager:
         # -- Add to queue
         payload = {
             "type": "update",
+            "account_did": account_did,
             "user_did": user_did,
             "interval": final_value
         }
@@ -141,10 +145,10 @@ class CommandManager:
     # -- Skip posts
     # A static number of posts the bot will skip, between 0 and 50 posts
     # A ranged interval of posts the bot will skip, between 0 and 50 posts
-    async def skip_posts(self, user_did: str, interval: str | None) -> tuple[bool, str]:
+    async def skip_posts(self, user_did: str, interval: str | None, account_did: str) -> tuple[bool, str]:
         # -- Validation and mormalisation
         if interval is None:
-            return await self.remove_setting(user_did, "skip")
+            return await self.remove_setting(user_did, "skip", account_did)
     
         # -- Check if the interval is a range or static value
         intervalSplit = interval.split("-")
@@ -187,6 +191,7 @@ class CommandManager:
         # -- Add to queue
         payload = {
             "type": "update",
+            "account_did": account_did,
             "user_did": user_did,
             "skip": final_value
         }
@@ -198,11 +203,12 @@ class CommandManager:
     # -------------
     # -- Delete
     # Delete all the users' settings
-    async def delete_settings(self, user_did: str) -> tuple[bool, str]:
+    async def delete_settings(self, user_did: str, account_did: str) -> tuple[bool, str]:
         # -- Add to queue
         payload = {
             "type": "delete",
-            "user_did": user_did
+            "user_did": user_did,
+            "account_did": account_did
         }
 
         await self.json_queue.put(payload)
@@ -212,7 +218,7 @@ class CommandManager:
     # -------------
     # -- Settings
     # View a users' settings
-    async def view_settings(self, user_did: str) -> tuple[bool, str]:
+    async def view_settings(self, user_did: str, account_did: str) -> tuple[bool, str]:
         # -- Settings helper
         def format_value(value):
             if isinstance(value, list):
@@ -220,18 +226,62 @@ class CommandManager:
             return value
 
         # -- Get settings
-        user_settings = self.user_data.get(user_did, {})
+        user_settings = self.user_data.get(account_did, {}).get(user_did, {})
       
         if not user_settings:
             return False, "You have no settings configured with the bot.\nUse !help to see options for settings!"
       
-
-
         format_settings = "\n".join(
             f"{key.capitalize()}: {format_value(value)}"
             for key, value in user_settings.items()
         )
         return True, f"Your settings can be seen below!\n{format_settings}"
+
+    # -------------
+    # -- Sync
+    # Sync a users' settings between bots
+    async def sync_settings(self, user_did: str, handle: str, bots: dict, account_did: str, other_dids: list) -> tuple[bool, str]:
+        # -- Get the bot to sync with
+        sync_did = None
+
+        for did, bot in bots.items():
+            if f"@{bot['handle']}" == handle:
+                sync_did = did
+                break
+        
+        # -- Validation
+        if sync_did is None or sync_did not in bots:
+            return False, "An error occurred while syncing your settings.\nPlease make sure you entered a valid bot handle.\nUse !help at any time to see all commands."
+
+        # -- Get the users' settings on the sync bot
+        sync_settings = self.user_data.get(sync_did, {}).get(user_did, {})
+
+        # -- Sync the settings to the other bot
+        if sync_did == account_did:
+            for other_did in other_dids:
+                payload = {
+                    "type": "update",
+                    "account_did": other_did,
+                    "user_did": user_did,
+                    **sync_settings
+                }
+                asyncio.create_task(self.json_queue.put(payload))
+
+                return True, f"Other bots have been synced with your settings from {bots[account_did]['handle']}!\nUse !settings on your other bots to view your synced settings.\nUse !help at any time to see all commands."
+     
+        # -- Sync the settings to this bot
+        elif sync_did != account_did:
+            payload = {
+                "type": "update",
+                "account_did": account_did,
+                "user_did": user_did,
+                **sync_settings
+            }
+            asyncio.create_task(self.json_queue.put(payload))
+
+            return True, f"Your settings have been synced with {bots[sync_did]['handle']}!\nUse !settings to view your synced settings.\nUse !help at any time to see all commands."
+        else:
+            return False, "An error occurred while syncing your settings.\nPlease make sure you entered a valid bot handle.\nUse !help at any time to see all commands."
 
     # -------------
     # -- Help
@@ -240,7 +290,7 @@ class CommandManager:
         # -- Format help
         text = "Check out the README file for a full list of commands and features."
         link_text = "README file"
-        uri = "https://github.com/Pikachannel/positivity-bot"
+        uri = "https://github.com/Pikachannel/reply-bots/blob/main/README.md"
         byte_start = text.encode("utf-8").find(link_text.encode("utf-8"))
         byte_end = byte_start + len(link_text.encode("utf-8"))
 
