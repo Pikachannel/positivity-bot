@@ -58,37 +58,37 @@ To view all your settings:
 
 #### Syncing Settings
 1. Send a direct message to the bot in the format:
-   - **Sync the current bot’s settings with another bot:** `!sync @other_bot_handle`
-   - **Sync all other bots’ settings with the current bot:** `!sync @current_bot_handle`
+   - **Sync the current bot’s settings with another bot:** `!sync <@other_bot_handle>`
+   - **Sync all other bots’ settings with the current bot:** `!sync <@current_bot_handle>`
 2. Wait for the bot to respond **before** sending a new message.
    - Responses may take up to 5 minutes.
 
 ##### Custom nickname
 1. Send a direct message to the bot in the format:  
-   - **Setting Nickname:** `!nickname insert_nickname_here` (your nickname can be max 20 characters)
+   - **Setting Nickname:** `!nickname <nickname>` (your nickname can be max 20 characters)
    - **Resetting Nickname:** `!nickname`
 2. Wait for the bot to respond **before** sending a new message.
    - Responses may take up to 5 minutes.
 
 #### Post chance 
 1. Send a direct message to the bot in the format:
-  - **Setting Chance:** `!chance insert_chance_here` (must be a number between 1 and 100)
+  - **Setting Chance:** `!chance <chance>` (must be a number between 1 and 100)
   - **Resetting Chance:** `!chance`
 2. Wait for the bot to respond **before** sending a new message.
    - Responses may take up to 5 minutes.
 
 #### Post interval
 1. Send a direct message to the bot in the format:
-  - **Setting Static Interval:** `!interval insert_interval_here` (must be a number between 60 and 3600)
-  - **Setting Variable Interval:** `!interval lower_bound-upper_bound` (both numbers must be between 60 and 3600)
+  - **Setting Static Interval:** `!interval <interval>` (must be a number between 60 and 3600)
+  - **Setting Variable Interval:** `!interval <lower_bound-upper_bound>` (both numbers must be between 60 and 3600)
   - **Resetting Interval:** `!interval`
 2. Wait for the bot to respond **before** sending a new message.
    - Responses may take up to 5 minutes
 
 #### Skip posts
 1. Send a direct message to the bot in the format:
-   - **Setting Static Interval:** `!skip insert_interval_here` (must be a integer between 0 and 50)
-   - **Setting Variable Interval:** `!skip lower_bound-upper_bound` (both integers must be between 0 and 50)
+   - **Setting Static Interval:** `!skip <intervaL>` (must be a integer between 0 and 50)
+   - **Setting Variable Interval:** `!skip <lower_bound-upper_bound>` (both integers must be between 0 and 50)
    - **Resetting Interval:** `!skip`
 2. Wait for the bot to respond **before** sending a new message.
    - Responses may take up to 5 minutes
