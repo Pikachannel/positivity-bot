@@ -1,5 +1,4 @@
 # -------- Imports --------
-import requests
 import time
 from typing import Any
 
@@ -7,7 +6,6 @@ from typing import Any
 class Filters:
     def __init__(self, client: Any) -> None:
         self.cache = {}
-        self.session = requests.Session()
         self.client = client
 
         # -- Load keyword list
