@@ -22,6 +22,7 @@ Evil Teto responds to your posts with funny mean messages!
 4. **Post chance**: Users can change the chance of a reply being made under their post.
 5. **Post interval**: Users can change the amount of time in between replies being able to be made under their posts. All replies are subject to a minimum 60 second cooldown.
 6. **Skip posts**: Users can change the amount of posts in between replies being able to be made under their posts.
+7. **Word of the Day**: Evil Teto will post a random word every single day.
 
 ### How to use
 1. Follow the bot on Bluesky.
