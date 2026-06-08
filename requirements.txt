@@ -1,3 +1,4 @@
 atproto
 python-dotenv
 websockets
+wonderwords
