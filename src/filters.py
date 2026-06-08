@@ -4,13 +4,10 @@ from typing import Any
 
 # -------- Filters Class --------
 class Filters:
-    def __init__(self, client: Any) -> None:
+    def __init__(self, client: Any, keyword_list: set) -> None:
         self.cache = {}
         self.client = client
-
-        # -- Load keyword list
-        with open("data/blocklist.txt", "r") as f:
-            self.keyword_list = {line.strip().lower() for line in f}
+        self.keyword_list = keyword_list
         
     # -- Flag keywords
     def keywords(self, message):
